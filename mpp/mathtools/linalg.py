@@ -1,9 +1,18 @@
+import sys
 import numpy as np
 from numpy import dot
 from itertools import combinations
 from cvxpy import *
 from math import acos,cos,sin,atan2
 from mathtools.polytope import Polytope
+import psutil
+import os
+
+def memory_usage_psutil():
+    # return the memory usage in MB
+    process = psutil.Process(os.getpid())
+    mem = process.get_memory_info()[0] / float(2 ** 20)
+    return mem
 
 def PCAprojectionOnList(X):
         return PCAprojection(specialListToNumpy(X))
@@ -27,6 +36,22 @@ def listToNumpy(X):
                 for i in range(0,N):
                         xx[i,j] = X[j][i]
         return xx
+
+def findProjectionMatrixArray(XL,XR):
+
+        objfunc = 0
+        ## M: number of points, N: dimension
+        M = XL.shape[0] 
+        N = XL.shape[1]
+        A = Variable(N,N)
+        for i in range(0,M):
+                objfunc += sum_squares(A*XL[i,:]-XR[i,:])
+        objective = Minimize(objfunc)
+
+        prob = Problem(objective, [])
+
+        d = sqrt(abs(prob.solve(solver=SCS))).value
+        return [np.array(A.value),d]
 
 def findProjectionMatrix(xl,xr):
         N = len(xl)

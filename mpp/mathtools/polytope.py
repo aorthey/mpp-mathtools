@@ -36,14 +36,14 @@ class Polytope:
                 bij = np.vstack((bi,bj))
                 return Polytope(Aij,bij)
 
-        def unionWithPolytope(self, rhs):
-                Ai = self.A
-                bi = self.b
-                Aj = rhs.A
-                bj = rhs.b
-                Aij = np.vstack((Ai,Aj))
-                bij = np.vstack((bi,bj))
-                return Polytope(Aij,bij)
+        #def unionWithPolytope(self, rhs):
+        #        Ai = self.A
+        #        bi = self.b
+        #        Aj = rhs.A
+        #        bj = rhs.b
+        #        Aij = np.vstack((Ai,Aj))
+        #        bij = np.vstack((bi,bj))
+        #        return Polytope(Aij,bij)
 
 
         def isTopologyChanging(self):
