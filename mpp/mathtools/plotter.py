@@ -58,7 +58,7 @@ class Plotter:
                 self.polytopeFromVertices(V, fcolor, ecolor)
 
         def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
-                self.hull = ConvexHull(V)
+                self.hull = ConvexHull(V,qhull_options='QJ')
                 faces = []
                 for ia, ib, ic in self.hull.simplices:
                      faces.append(V[[ia, ib, ic]])

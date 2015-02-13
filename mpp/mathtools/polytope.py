@@ -1,7 +1,10 @@
+import sys,os
+sys.path.append(os.environ["MPP_PATH"]+"mpp-robot/mpp")
 import numpy as np
 from numpy import dot
 from itertools import combinations
 from sympy import *
+from robot.robotspecifications import *
 
 class Polytope:
 
@@ -10,8 +13,40 @@ class Polytope:
                 self.b=b
                 self.xyz=xyz
                 self.V=[]
+                self.Atmp = []
                 self.mean = np.zeros((3,1))
                 self.isTopologyChanging_=False
+
+        def getRandomSampleWithKnownHyperrectangle(self,H):
+                X=H.getRandomSampleHyperrectangle()
+                Xp = projectPointOntoPolytope(X, self.A, self.b)
+                return Xp
+                #samples=0
+                #while True:
+                #        X=H.getRandomSampleHyperrectangle()
+                #        samples+=1
+                #        P = np.less_equal(dot(self.A,X),self.b)
+                #        if samples%100==0:
+                #                print "trying",samples
+                #        if P.all():
+                #                print "success after",samples,"samples"
+                #                success=True
+                #                return X
+
+        def getRandomSampleHyperrectangle(self):
+                X = np.zeros((XSPACE_DIMENSION,1))
+                for i in range(0,XSPACE_DIMENSION):
+                        u=self.b[i]
+                        l=-self.b[i+XSPACE_DIMENSION]
+                        if u>l:
+                                X[i]=np.random.uniform(l,u)
+                        else:
+                                X[i]=np.random.uniform(u,l)
+
+                return X
+
+        def setArk(self,Ark):
+                self.Atmp = Ark
 
         def __str__(self):
                 out = ""
@@ -34,7 +69,9 @@ class Polytope:
                 bj = rhs.b
                 Aij = np.vstack((Ai,Aj))
                 bij = np.vstack((bi,bj))
-                return Polytope(Aij,bij)
+                P = Polytope(Aij,bij,self.xyz)
+                P.Atmp = self.Atmp
+                return P
 
         #def unionWithPolytope(self, rhs):
         #        Ai = self.A

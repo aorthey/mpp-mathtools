@@ -50,7 +50,7 @@ def findProjectionMatrixArray(XL,XR):
 
         prob = Problem(objective, [])
 
-        d = sqrt(abs(prob.solve(solver=SCS))).value
+        d = sqrt(pow(prob.solve(solver=SCS),2)).value
         return [np.array(A.value),d]
 
 def findProjectionMatrix(xl,xr):
@@ -272,6 +272,14 @@ def distancePointWalkableSurface(v, W):
         prob = Problem(objective, constraints)
         return sqrt(abs(prob.solve())).value
 
+def projectPointOntoPolytopeNdim(X, Ai, bi):
+        xob = Variable(X.shape[0],1)
+        objective = Minimize(sum_squares(xob  - X))
+        constraints = [np.matrix(Ai)*xob <= bi]
+        prob = Problem(objective, constraints)
+        d = prob.solve(solver=SCS)
+        return np.array(xob.value)
+
 def projectPointOntoPolytope(v, Ai, bi):
         xob = Variable(3)
         objective = Minimize(sum_squares(xob  - v))
@@ -318,7 +326,8 @@ def distancePolytopePolytope(Pi, Pj):
         #constraints = [np.dot(Ai,xob)<= bi,np.dot(Aj,yob) <= bj]
         constraints = [np.matrix(Ai)*xob<= bi,np.matrix(Aj)*yob <= bj]
         prob = Problem(objective, constraints)
-        return sqrt(abs(prob.solve())).value
+        d= sqrt(pow(prob.solve(solver=SCS),2)).value
+        return d
 
 def distancePolytopePolytopeNdim(Pi, Pj):
         Ai = Pi.A
