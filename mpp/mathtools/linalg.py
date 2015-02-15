@@ -272,6 +272,35 @@ def distancePointWalkableSurface(v, W):
         prob = Problem(objective, constraints)
         return sqrt(abs(prob.solve())).value
 
+def getNearestWalkableSurfacesFromStartGoalPoint(xstart, xgoal, Wsurfaces):
+        startWS = -1
+        goalWS = -1
+        ds = 10000
+        dg = 10000
+        for i in range(0,len(Wsurfaces)):
+                W = Wsurfaces[i]
+                dds = distancePointWalkableSurface(xstart, W)
+                ddg = distancePointWalkableSurface(xgoal, W)
+                if dds < ds:
+                        ds = dds
+                        startWS = i
+                if ddg < dg:
+                        dg = ddg
+                        goalWS = i
+
+        dg = np.around(dg,3)
+        ds = np.around(ds,3)
+        if dg>0.5 or ds>0.5:
+                print "=============================================================="
+                print "[ERROR]"
+                print "=============================================================="
+                print "start or goal contact too far away from walkable surfaces:"
+                print "goal:",xgoal,"mindist:",dg
+                print "start:",xstart,"mindist:",ds
+                print "=============================================================="
+                sys.exit(0)
+        return [startWS,goalWS]
+
 def projectPointOntoPolytopeNdim(X, Ai, bi):
         xob = Variable(X.shape[0],1)
         objective = Minimize(sum_squares(xob  - X))

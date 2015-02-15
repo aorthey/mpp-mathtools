@@ -6,6 +6,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy.spatial import Delaunay
 from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
+from robot.robotspecifications import *
 
 ### counterclock wise rotation
 def rotFromRPY(tx,ty,tz):
@@ -57,6 +58,17 @@ class Plotter:
 
                 self.polytopeFromVertices(V, fcolor, ecolor)
 
+        def allPolytopes(self,polytopes):
+                for i in range(0,len(polytopes)):
+                        V = polytopes[i].getVertexRepresentation()
+                        self.polytopeFromVertices( V, fcolor=COLOR_SCENE)
+
+        def allWalkableSurfaces(self,wsurfaces):
+                for i in range(0,len(wsurfaces)):
+                        W = wsurfaces[i]
+                        V = W.getVertexRepresentation()
+                        self.walkableSurface( V, fcolor=COLOR_WALKABLE_SURFACE, thickness=0.01)
+
         def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
                 self.hull = ConvexHull(V,qhull_options='QJ')
                 faces = []
@@ -83,8 +95,8 @@ class Plotter:
                 print xx
                 self.rax.plot_wireframe(xx,yy,zz, color="b")
 
-        def point(self, x, size=100, color=(1,0,0,1)):
-                self.ax.scatter(x[0],x[1],x[2], s=size, c=color )
+        def point(self, x, size=100, color=(1,0,0,1), zorder=100):
+                self.ax.scatter(x[0],x[1],x[2], s=size, c=color, zorder=zorder )
 
         def showRobot(self):
                 self.rax.set_xlabel('x-axis')

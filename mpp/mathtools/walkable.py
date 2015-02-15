@@ -221,9 +221,7 @@ def WalkableSurfacesFromPolytopes(polytopes):
 
         ctrW = 0
 
-        print "-----------------------------------------------"
         print "Computing Walkable Surfaces from Polytopes"
-        print "-----------------------------------------------"
 
         N = len(polytopes)
         ##iterate over all polytopes
@@ -265,8 +263,7 @@ def WalkableSurfacesFromPolytopes(polytopes):
                                         ctrW = ctrW + 1
                                         W.append(WalkableSurface(a,b[j],p.A,p.b,i))
 
-        print "Found",len(W),"initial walkable surfaces in environment"
-        print "-----------------------------------------------"
+        print "Found",len(W),"walkable surfaces in environment"
         return W
 
 def ProjectPolytopesDownInsideBox(polytopes, surface, box):
