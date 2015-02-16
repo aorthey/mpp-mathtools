@@ -1,10 +1,11 @@
 import numpy as np
 from math import sin,cos,pi,sqrt
+from robot.robotspecifications import K_POLYNOMIAL_BASIS_FUNCTIONS
 import sys
 
 def Fpoly(x): 
-        N=2000
-        return np.array(map(lambda e: map(lambda x: pow(x,e), x),np.arange(0,N)))
+        K = K_POLYNOMIAL_BASIS_FUNCTIONS
+        return np.array(map(lambda e: map(lambda x: pow(x,e), x),np.arange(0,K)))
 
 def Ffourier(x): 
         N = 2000
