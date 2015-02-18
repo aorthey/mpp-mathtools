@@ -75,7 +75,7 @@ class Plotter:
                 for ia, ib, ic in self.hull.simplices:
                      faces.append(V[[ia, ib, ic]])
                 items = Poly3DCollection(faces, facecolors=[fcolor],
-                                edgecolors=[ecolor])
+                                edgecolors=[ecolor],zorder=10)
                 self.ax.add_collection(items)
                 #self.ax.scatter(V[:,0], V[:,1], V[:,2], 'r*')
 
