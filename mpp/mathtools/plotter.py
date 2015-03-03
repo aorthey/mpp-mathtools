@@ -38,16 +38,17 @@ class Plotter:
 
         def walkableSurface(self ,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
                 self.polytopeFromPolygonVertices3D(Vin,thickness=thickness, \
-                                fcolor=fcolor,ecolor=ecolor)
+                                fcolor=fcolor,zorder=ZORDER_WALKABLE_SURFACE,ecolor=ecolor)
 
-        def polytopeFromPolygonVertices3D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
+        def polytopeFromPolygonVertices3D(self,Vin,thickness=0.1, \
+                        fcolor=(0,0,0,0.1), zorder=1, ecolor=DEFAULT_EDGE_COLOR):
                 Vz = np.zeros((len(Vin),1))
                 Vz.fill(thickness/2)
                 Vup = column_stack((Vin[:,0:2],thickness/2+Vin[:,2]))
                 Vdown = column_stack((Vin[:,0:2],-thickness/2+Vin[:,2]))
                 V = np.vstack((Vdown, Vup))
 
-                self.polytopeFromVertices(V, fcolor, ecolor)
+                self.polytopeFromVertices(V, fcolor, ecolor, zorder)
 
         def polytopeFromVertices2D(self,Vin,thickness=0.1, fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
                 Vz = np.zeros((len(Vin),1))
@@ -69,15 +70,14 @@ class Plotter:
                         V = W.getVertexRepresentation()
                         self.walkableSurface( V, fcolor=COLOR_WALKABLE_SURFACE, thickness=0.01)
 
-        def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR):
+        def polytopeFromVertices(self,V,fcolor=(0,0,0,0.1), ecolor=DEFAULT_EDGE_COLOR, zorder=ZORDER_DEFAULT):
                 self.hull = ConvexHull(V,qhull_options='QJ')
                 faces = []
                 for ia, ib, ic in self.hull.simplices:
                      faces.append(V[[ia, ib, ic]])
                 items = Poly3DCollection(faces, facecolors=[fcolor],
-                                edgecolors=[ecolor],zorder=10)
+                                edgecolors=[ecolor],zorder=[zorder])
                 self.ax.add_collection(items)
-                #self.ax.scatter(V[:,0], V[:,1], V[:,2], 'r*')
 
         def capsule(self, radius, length, xyz, rpy):
                 x = xyz[0]
@@ -105,9 +105,9 @@ class Plotter:
                 self.robot_fig.show()
 
         def showEnvironment(self):
-                self.ax.set_xlim(-2, 2)
-                self.ax.set_ylim(-2, 2)
-                self.ax.set_zlim(0, 1.5)
+                #self.ax.set_xlim(-2, 2)
+                #self.ax.set_ylim(-2, 2)
+                #self.ax.set_zlim(0, 1.5)
                 self.fig.show()
 
         def pause(self,t):
@@ -136,7 +136,7 @@ class Plotter:
 
                 self.ax.plot(x, y, z, style,linewidth=lw)
 
-        def lines(self, L,style='o-r'):
+        def lines(self, L, colorIn='r',style='o-r',zorder=ZORDER_DEFAULT):
                 N = L.shape[0]
                 M = L.shape[1]
                 for i in range(0,N):
@@ -144,7 +144,10 @@ class Plotter:
                         x = l[:][0]
                         y = l[:][1]
                         z = l[:][2]
-                        self.ax.plot(x, y, z, style,linewidth=8.0)
+                        self.ax.plot(x, y, z, style, color=colorIn, \
+                                        linewidth=SWEPTVOLUME_LINE_SIZE, \
+                                        markersize=SWEPTVOLUME_MARKER_SIZE,\
+                                        zorder=zorder)
 
 
         def display_capsule2(self, Xc, rpy, length, r, color='r'):

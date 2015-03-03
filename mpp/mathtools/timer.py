@@ -11,6 +11,10 @@ class Timer:
         def getTime(self):
                 return self.time
 
+        def stopWithoutPrint(self):
+                self.end = timer()
+                self.time = self.end - self.start
+
         def stop(self,comment=None):
                 self.end = timer()
                 self.time = self.end - self.start
