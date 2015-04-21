@@ -5,6 +5,7 @@ from itertools import combinations
 from cvxpy import *
 from math import acos,cos,sin,atan2
 from mathtools.polytope import Polytope
+from scipy.spatial import ConvexHull
 import psutil
 import os
 
@@ -469,3 +470,54 @@ def hyperplanesToVertices(A,b):
                 return []
 
         return vertices
+
+
+def Rz(t):
+        return np.array([[cos(t),-sin(t),0],[sin(t),cos(t),0],[0,0,1]])
+def Ry(t):
+        return np.array([[cos(t),0,sin(t)],[0,1,0],[-sin(t),0,cos(t)]])
+def Rx(t):
+        return np.array([[1,0,0],[0,cos(t),-sin(t)],[0,sin(t),cos(t)]])
+
+def R_RPY(r,p,y):
+        R_y = Rz(y)
+        R_p = Ry(p)
+        R_r = Rx(r)
+        return np.dot(R_r,np.dot(R_p,R_y))
+
+
+def boxToPts(x,y,z,ro,po,yo,sx,sy,sz):
+        R = R_RPY(ro,po,yo)
+
+        p = np.zeros((8,3))
+        p[0,:] = [x+sx/2, y+sy/2, z+sz/2]
+        p[1,:] = [x+sx/2, y+sy/2, z-sz/2]
+        p[2,:] = [x+sx/2, y-sy/2, z+sz/2]
+        p[3,:] = [x+sx/2, y-sy/2, z-sz/2]
+        p[4,:] = [x-sx/2, y+sy/2, z+sz/2]
+        p[5,:] = [x-sx/2, y+sy/2, z-sz/2]
+        p[6,:] = [x-sx/2, y-sy/2, z+sz/2]
+        p[7,:] = [x-sx/2, y-sy/2, z-sz/2]
+
+
+        for i in range(0,p.shape[0]):
+                p[i,:] = np.dot(R,p[i,:])
+
+        return p
+
+def ptsToPolytope(pts):
+        hull = ConvexHull(pts)
+        E=hull.equations[0::2]
+        Ah = np.array(E[0:,0:3])
+        bh = np.zeros((len(Ah),1))
+        #bh = np.array((-E[0:,3]))
+        for k in range(0,len(Ah)):
+                bh[k] = -E[k,3]
+        #bh = -E[0:,3]
+        ###normalize
+        for at in range(0,len(Ah)):
+                normA = np.linalg.norm(Ah[at])
+                Ah[at] = Ah[at]/normA
+                bh[at] = bh[at]/normA
+        p = Polytope(Ah,bh,np.mean(pts))
+        return p
